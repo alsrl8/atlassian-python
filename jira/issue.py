@@ -22,7 +22,7 @@ def print_jira_issues(issues, total: int):
         print()
 
 
-def get_jira_issues(jql="", max_results=100):
+def get_jira_issues(jql="", max_results=100, exec_print: bool=True):
     """
     Jira 이슈 목록 조회
     """
@@ -38,12 +38,13 @@ def get_jira_issues(jql="", max_results=100):
 
     data = jira_request('/rest/api/3/search', method='GET', params=params)
 
-    pretty_json(data)
+    # pretty_json(data)
 
     if not data:
         return None
 
-    print_jira_issues(data["issues"], data["total"])
+    if exec_print:
+        print_jira_issues(data["issues"], data["total"])
     return data["issues"]
 
 
