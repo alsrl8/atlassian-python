@@ -147,23 +147,6 @@ def delete_jira_issue(issue_key: str):
         return False
 
 
-def get_jira_issue_detail(issue_key: str):
-    """
-    특정 이슈 상세 조회 (GET)
-    """
-    result = jira_request(f'/rest/api/3/issue/{issue_key}')
-
-    if result:
-        print(f"📄 이슈 {issue_key} 상세 정보:")
-        print(f"   제목: {result['fields']['summary']}")
-        print(f"   상태: {result['fields']['status']['name']}")
-        print(f"   fields: {result['fields']}")
-        return result
-    else:
-        print(f"❌ 이슈 {issue_key} 조회 실패")
-        return None
-
-
 def add_comment_to_issue(issue_key: str, comment_text: str):
     """
     이슈에 코멘트 추가 (POST)
@@ -191,35 +174,3 @@ def add_comment_to_issue(issue_key: str, comment_text: str):
         return None
 
 
-def transition_issue(issue_key: str, transition_id: str):
-    """
-    이슈 상태 전환 (POST)
-    """
-    transition_data = {
-        "transition": {"id": transition_id}
-    }
-
-    result = jira_request(f'/rest/api/3/issue/{issue_key}/transitions', method='POST', data=transition_data)
-
-    if result:
-        print(f"✅ 이슈 {issue_key} 상태 전환 완료")
-        return result
-    else:
-        print(f"❌ 이슈 {issue_key} 상태 전환 실패")
-        return None
-
-
-def get_available_transitions(issue_key: str):
-    """
-    이슈의 가능한 상태 전환 목록 조회 (GET)
-    """
-    result = jira_request(f'/rest/api/3/issue/{issue_key}/transitions')
-
-    if result:
-        print(f"📋 이슈 {issue_key}의 가능한 상태 전환:")
-        for transition in result['transitions']:
-            print(f"   ID: {transition['id']} - {transition['name']}")
-        return result['transitions']
-    else:
-        print(f"❌ 이슈 {issue_key} 상태 전환 목록 조회 실패")
-        return None
