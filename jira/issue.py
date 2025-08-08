@@ -3,7 +3,26 @@ from jira.request import jira_request
 from util.print_ import pretty_json
 
 
-def get_jira_issues(jql="", max_results=10):
+def print_jira_issues(issues, total: int):
+    print(f"📋 총 {total}개 이슈 중 {len(issues)}개 조회")
+    print("-" * 60)
+
+    domain = get_domain()
+
+    for i, issue in enumerate(issues, 1):
+        key = issue['key']
+        summary = issue['fields']['summary']
+        status = issue['fields']['status']['name']
+        assignee = issue['fields']['assignee']
+        assignee_name = assignee['displayName'] if assignee else '미할당'
+
+        print(f"{i:2d}. [{key}] {summary}")
+        print(f"    상태: {status} | 담당자: {assignee_name}")
+        print(f"    링크: https://{domain}/browse/{key}")
+        print()
+
+
+def get_jira_issues(jql="", max_results=100):
     """
     Jira 이슈 목록 조회
     """
@@ -19,29 +38,13 @@ def get_jira_issues(jql="", max_results=10):
 
     data = jira_request('/rest/api/3/search', method='GET', params=params)
 
+    pretty_json(data)
+
     if not data:
         return None
 
-    issues = data['issues']
-    domain = get_domain()
-
-    print(f"📋 총 {data['total']}개 이슈 중 {len(issues)}개 조회")
-    print("-" * 60)
-
-    for i, issue in enumerate(issues, 1):
-        key = issue['key']
-        summary = issue['fields']['summary']
-        status = issue['fields']['status']['name']
-        assignee = issue['fields']['assignee']
-        assignee_name = assignee['displayName'] if assignee else '미할당'
-        print(f"issue : {issue}")
-        print(f"key : {key}")
-
-        print(f"{i:2d}. [{key}] {summary}")
-        print(f"    상태: {status} | 담당자: {assignee_name}")
-        print(f"    링크: https://{domain}/browse/{key}")
-        print()
-    return issues
+    print_jira_issues(data["issues"], data["total"])
+    return data["issues"]
 
 
 def get_my_jira_issue_not_done(max_result: int = 5):
